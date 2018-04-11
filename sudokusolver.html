@@ -1,16 +1,221 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Lightern's Sudoku Solver</h2>
 
-<h1>My First JavaScript</h1>
 
-<button type="button"
-onclick="document.getElementById('demo').innerHTML = Date()">
-Click me to display Date and Time.</button>
+<form id="inputform">
+  <input type="text" name="1" size="1">
+  <input type="text" name="2" size="1">
+  <input type="text" name="3" size="1">
+  &nbsp;
+  <input type="text" name="4" size="1">
+  <input type="text" name="5" size="1">
+  <input type="text" name="6" size="1">
+  &nbsp;
+  <input type="text" name="7" size="1">
+  <input type="text" name="8" size="1">
+  <input type="text" name="9" size="1">
+  &nbsp;
+  <br>
+  <input type="text" name="10" size="1">
+  <input type="text" name="11" size="1">
+  <input type="text" name="12" size="1">
+  &nbsp;
+  <input type="text" name="13" size="1">
+  <input type="text" name="14" size="1">
+  <input type="text" name="15" size="1">
+  &nbsp;
+  <input type="text" name="16" size="1">
+  <input type="text" name="17" size="1">
+  <input type="text" name="18" size="1">
+  &nbsp;
+  <br>
+  <input type="text" name="19" size="1">
+  <input type="text" name="20" size="1">
+  <input type="text" name="21" size="1">
+  &nbsp;
+  <input type="text" name="22" size="1">
+  <input type="text" name="23" size="1">
+  <input type="text" name="24" size="1">
+  &nbsp;
+  <input type="text" name="25" size="1">
+  <input type="text" name="26" size="1">
+  <input type="text" name="27" size="1">
+  &nbsp;
+  <br>
+  <br>
+  <input type="text" name="28" size="1">
+  <input type="text" name="29" size="1">
+  <input type="text" name="30" size="1">
+  &nbsp;
+  <input type="text" name="31" size="1">
+  <input type="text" name="32" size="1">
+  <input type="text" name="33" size="1">
+  &nbsp;
+  <input type="text" name="34" size="1">
+  <input type="text" name="35" size="1">
+  <input type="text" name="36" size="1">
+  &nbsp;
+  <br>
+  <input type="text" name="37" size="1">
+  <input type="text" name="38" size="1">
+  <input type="text" name="39" size="1">
+  &nbsp;
+  <input type="text" name="40" size="1">
+  <input type="text" name="41" size="1">
+  <input type="text" name="42" size="1">
+  &nbsp;
+  <input type="text" name="43" size="1">
+  <input type="text" name="44" size="1">
+  <input type="text" name="45" size="1">
+  &nbsp;
+  <br>
+  <input type="text" name="46" size="1">
+  <input type="text" name="47" size="1">
+  <input type="text" name="48" size="1">
+  &nbsp;
+  <input type="text" name="49" size="1">
+  <input type="text" name="50" size="1">
+  <input type="text" name="51" size="1">
+  &nbsp;
+  <input type="text" name="52" size="1">
+  <input type="text" name="53" size="1">
+  <input type="text" name="54" size="1">
+  &nbsp;
+  <br>
+  <br>
+  <input type="text" name="55" size="1">
+  <input type="text" name="56" size="1">
+  <input type="text" name="57" size="1">
+  &nbsp;
+  <input type="text" name="58" size="1">
+  <input type="text" name="59" size="1">
+  <input type="text" name="60" size="1">
+  &nbsp;
+  <input type="text" name="61" size="1">
+  <input type="text" name="62" size="1">
+  <input type="text" name="63" size="1">
+  &nbsp;
+  <br>
+  <input type="text" name="64" size="1">
+  <input type="text" name="65" size="1">
+  <input type="text" name="66" size="1">
+  &nbsp;
+  <input type="text" name="67" size="1">
+  <input type="text" name="68" size="1">
+  <input type="text" name="69" size="1">
+  &nbsp;
+  <input type="text" name="70" size="1">
+  <input type="text" name="71" size="1">
+  <input type="text" name="72" size="1">
+  &nbsp;
+  <br>
+  <input type="text" name="73" size="1">
+  <input type="text" name="74" size="1">
+  <input type="text" name="75" size="1">
+  &nbsp;
+  <input type="text" name="76" size="1">
+  <input type="text" name="77" size="1">
+  <input type="text" name="78" size="1">
+  &nbsp;
+  <input type="text" name="79" size="1">
+  <input type="text" name="80" size="1">
+  <input type="text" name="81" size="1">
+  &nbsp;
+  <br>
+  <br>
+</form> 
 
-var sudoku = [0] 
+<button onclick="solve()">Solve</button>
 
-<p id="demo"></p>
+<p id="printarea"></p>
+
+<script>
+// Beginning of the script --------------------------------
+
+function solve() {
+    var form = document.getElementById("inputform");
+    var sudoku = [];
+    
+    for (i = 0; i < form.length ;i++) {
+        sudoku.push(form.elements[i].value);
+    }
+
+    var maxcount = starttest(sudoku);
+
+    document.getElementById("printarea").innerHTML = sudoku[0] + " " + maxcount;
+}
+
+function starttest(sudoku) {
+    var numbercount = 0;
+    var maxcount = 0;
+    var testnumbers = [];
+
+    for (i = 0; i < 10; i++) {
+        // Test all
+        for (ii = 0; ii < 9; ii++) {
+            // Test current row
+            testnumbers = sudoku.slice(0, 9);
+            numbercount = testnumbers.filter(function(element){return element==i;}).length;
+            if (numbercount > maxcount) {
+                maxcount = numbercount;
+            }
+            numbercount = 0;
+            // Test current column
+            for (iii = 0; iii < 9; iii++) {
+                if (sudoku[9*iii+ii] == i) {numbercount += 1;};
+            }
+            if (numbercount > maxcount) {
+                maxcount = numbercount;
+            }
+            numbercount = 0;
+            // Test current box
+            var boxvalues = [];
+            switch (ii) {
+                case 0: 
+                boxvalues = [0, 1, 2, 9, 10, 11, 18, 19, 20]
+                break;
+                case 1: 
+                boxvalues = [3, 4, 5, 12, 13, 14, 21, 22, 23]
+                break;
+                case 2: 
+                boxvalues = [6, 7, 8, 15, 16, 17, 24, 25, 26]
+                break;
+                case 3: 
+                boxvalues = [27, 28, 29, 36, 37, 38, 45, 46, 47]
+                break;
+                case 4: 
+                boxvalues = [30, 31, 32, 39, 40, 41, 48, 49, 50]
+                break;
+                case 5: 
+                boxvalues = [33, 34, 35, 42, 43, 44, 51, 52, 53]
+                break;
+                case 6: 
+                boxvalues = [54, 55, 56, 63, 64, 65, 72, 73, 74]
+                break;
+                case 7: 
+                boxvalues = [57, 58, 59, 66, 67, 68, 75, 76, 77]
+                break;
+                case 8: 
+                boxvalues = [60, 61, 62, 69, 70, 71, 78, 79, 80]
+                break;
+                };
+                for (iiii = 0; iiii < 9; iiii++) {
+                if (sudoku[boxvalues[iiii]] == i) {numbercount += 1};
+            }
+            if (numbercount > maxcount) {
+                maxcount = numbercount;
+            }
+            
+        }
+    }
+    return maxcount;
+
+}
+
+// End of the script --------------------------------------
+</script>
 
 </body>
-</html> 
+</html>
