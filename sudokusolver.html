@@ -1,354 +1,402 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script>
-    // Beginning of the script --------------------------------
-    
-function start() {
-    var form = document.getElementById("inputform");
-    var sudoku = [];
-    
-    for (i = 0; i < form.length ;i++) {
-        sudoku.push(form.elements[i].value);
-    }
+    <script>
+        // Beginning of the script --------------------------------
+        function start() {
+            var form = document.getElementById("inputform");
+            var sudoku = [];
 
-    // Let's check that the form is filled right
-    var maxcount = starttest(sudoku);
-    if (maxcount < 2) {
-        var vastaus = solve(sudoku);
-    }
+            var countzeros = 0;
+            for (i = 0; i < form.length; i++) {
+                if ((form.elements[i].value > 0) && (form.elements[i].value < 10)) {
+                    sudoku.push(form.elements[i].value);
+                }
+                else {
+                    sudoku.push(0);
+                    countzeros++;
+                }
+            }
 
-    document.getElementById("printarea").innerHTML = sudoku[0] + " " + vastaus[0];
-}
+            if (countzeros > 0) {
+                // Let's check that the form is filled right
+                var maxcount = 1
+                if (maxcount < 2) {
+                    // If everything's good, let's solve the sudoku!
+                    var vastaus = solve(sudoku);
+                }
 
-
-function solve(sudoku) {
-    var solvables_index = [];
-
-    // Let's create list of indexes for those that need to be solved
-    for (i = 0; i < sudoku.length; i++) {
-        if (sudoku[i] == 0) {
-            solvables_index.push(i);
+                for (ii = 0; ii < form.length; ii++) {
+                    document.getElementById(ii + 1).value = vastaus[ii];
+                }
+            }
+            else {
+                document.getElementById("printarea").innerHTML = "Filled already!";
+            }
         }
-    }
 
-    // n represents an index in whole sudoku number set
-    var n = 0;
 
-    nextn: while (true) {
-        numbersearch: while (true) {
-            // In case of drop (coming backward from higher solvable_index)
-            if (sudoku[solvables_index[n]] == 9) {
-                sudoku[solvables_index[n]] = 0;
-                n -= 1;
-                continue numbersearch;
+        function solve(sudoku) {
+            var solvables_index = [];
+
+            // Let's create list of indexes for those that need to be solved
+            for (i = 0; i < sudoku.length; i++) {
+                if (sudoku[i] == 0) {
+                    solvables_index.push(i);
+                }
             }
 
-            sudoku[solvables_index[n]] += 1;
-            var testsum = 0;
+            // n represents an index in whole sudoku number set
+            var n = 0;
 
-            // Check row
-            testsum += rowtest(solvables_index[n], sudoku);
-            if (testsum == 1) {
-                // Check column
-                testsum += columntest(solvables_index[n], sudoku);
-            }
-            if (testsum == 2) {
-                // Check "box"
-                testsum += boxtest(solvables_index[n], sudoku);
-            }
-
-            if (testsum < 3) {
-                if (sudoku[solvables_index[n]] == 9) {
-                    sudoku[solvables_index[n]] = 0;
-                    if (n == 0) {
-                        console.log("Answer not found!");
-                        // exit(666);          // In case you want to make it without GUI
-                        return sudoku;
+            nextn: while (true) {
+                numbersearch: while (true) {
+                    // In case of drop (coming backward from higher solvable_index)
+                    if (sudoku[solvables_index[n]] == 9) {
+                        sudoku[solvables_index[n]] = 0;
+                        n -= 1;
+                        continue numbersearch;
                     }
 
-                    n -= 1;
+                    sudoku[solvables_index[n]] += 1;
+                    var testsum = 0;
+
+                    // Check row
+                    testsum += rowtest(solvables_index[n], sudoku);
+                    if (testsum == 1) {
+                        // Check column
+                        testsum += columntest(solvables_index[n], sudoku);
+                    }
+                    if (testsum == 2) {
+                        // Check "box"
+                        testsum += boxtest(solvables_index[n], sudoku);
+                    }
+
+                    if (testsum < 3) {
+                        if (sudoku[solvables_index[n]] == 9) {
+                            sudoku[solvables_index[n]] = 0;
+                            if (n == 0) {
+                                document.getElementById("printarea").innerHTML = "Answer not found!";
+                                return sudoku;
+                            }
+
+                            n -= 1;
+                        }
+                        continue numbersearch;
+                    }
+
+                    if (n == solvables_index.length - 1) {
+                        break nextn;
+                    }
+
+                    n += 1;
                 }
-                continue numbersearch;
             }
-
-            if (n == solvables_index.len() - 1) {
-                break nextn;
-            }
-
-            n += 1;
+            return sudoku;
         }
-    }
-    return sudoku;
-}
 
 
+        function boxtest(indexnumber, sudoku) {
 
-function rowtest(indexnumber, sudoku) { 
-    switch(indexnumber) {
-        case 0-8:
-            var row = 0;
-            break;
-        case 9-17:
-            var row = 1;
-            break;
-        case 18-26:
-            var row = 2;
-            break;
-        case 27-35:
-            var row = 3;
-            break;
-        case 36-44:
-            var row = 4;
-            break;
-        case 45-53:
-            var row = 5;
-            break;
-        case 54-62:
-            var row = 6;
-            break;
-        case 63-71:
-            var row = 7;
-            break;
-        default:
-            var row = 4;
-            break;
-    };
+            var box = [
+                [0, 1, 2, 9, 10, 11, 18, 19, 20],
+                [3, 4, 5, 12, 13, 14, 21, 22, 23],
+                [6, 7, 8, 15, 16, 17, 24, 25, 26],
+                [27, 28, 29, 36, 37, 38, 45, 46, 47],
+                [30, 31, 32, 39, 40, 41, 48, 49, 50],
+                [33, 34, 35, 42, 43, 44, 51, 52, 53],
+                [54, 55, 56, 63, 64, 65, 72, 73, 74],
+                [57, 58, 59, 66, 67, 68, 75, 76, 77],
+                [60, 61, 62, 69, 70, 71, 78, 79, 80]
+            ];
 
-    var counter = 0;
-    var result = while (true) {
-        if (row * 9 + counter != indexnumber && sudoku[row * 9 + counter] == sudoku[indexnumber]) {
-            break 0;
+            for (i = 0; i < 9; i++) {
+                if (box[i].indexOf(indexnumber) != -1) {
+                    boxnumber = i;
+                }
+            }
+
+            var counter = 0;
+            while (true) {
+                if ((box[boxnumber][counter] != indexnumber) && (sudoku[box[boxnumber][counter]] == sudoku[indexnumber])) {
+                    return 0;
+                }
+                if (counter == 8) {
+                    return 1;
+                }
+                counter += 1;
+            };
         }
-        if (counter == 8) {
-            break 1;
+
+        
+        function columntest(indexnumber, sudoku) {
+            var column = (indexnumber + 9) % 9;
+            var counter = 0;
+            while (true) {
+                if ((counter * 9 + column != indexnumber) && (sudoku[counter * 9 + column] == sudoku[indexnumber])) {
+                    return 0;
+                }
+                if (counter == 8) {
+                    return 1;
+                }
+                counter += 1;
+            };
         }
-        counter += 1;
-    };
-    return result;
-}
 
+        
+        function rowtest(indexnumber, sudoku) {
+            switch (true) {
+                case (indexnumber < 9):
+                    var row = 0;
+                    break;
+                case (indexnumber < 18):
+                    var row = 1;
+                    break;
+                case (indexnumber < 27):
+                    var row = 2;
+                    break;
+                case (indexnumber < 36):
+                    var row = 3;
+                    break;
+                case (indexnumber < 45):
+                    var row = 4;
+                    break;
+                case (indexnumber < 54):
+                    var row = 5;
+                    break;
+                case (indexnumber < 63):
+                    var row = 6;
+                    break;
+                case (indexnumber < 72):
+                    var row = 7;
+                    break;
+                default:
+                    var row = 8;
+                    break;
+            };
 
-
-
-
-
-
-
-// -----------------------------------------------------------
-
-
-
-
-
-
-
-
-
-// Tsekattu ja toimii
-function starttest(sudoku) {
-    var numbercount = 0;
-    var maxcount = 0;
-    var testnumbers = [];
-
-    for (i = 1; i < 10; i++) {
-        // Test all
-        for (ii = 0; ii < 9; ii++) {
-            // Test current row
-            testnumbers = sudoku.slice(0+ii*9, 9+ii*9);
-            numbercount = testnumbers.filter(function(element){return element==i;}).length;
-            if (numbercount > maxcount) {
-                maxcount = numbercount;
-            }
-            //console.log(maxcount);
-            numbercount = 0;
-            // Test current column
-            for (iii = 0; iii < 9; iii++) {
-                if (sudoku[9*iii+ii] == i) {numbercount += 1;};
-            }
-            if (numbercount > maxcount) {
-                maxcount = numbercount;
-            }
-            numbercount = 0;
-            // Test current box
-            var boxvalues = [];
-            switch (ii) {
-                case 0: 
-                boxvalues = [0, 1, 2, 9, 10, 11, 18, 19, 20]
-                break;
-                case 1: 
-                boxvalues = [3, 4, 5, 12, 13, 14, 21, 22, 23]
-                break;
-                case 2: 
-                boxvalues = [6, 7, 8, 15, 16, 17, 24, 25, 26]
-                break;
-                case 3: 
-                boxvalues = [27, 28, 29, 36, 37, 38, 45, 46, 47]
-                break;
-                case 4: 
-                boxvalues = [30, 31, 32, 39, 40, 41, 48, 49, 50]
-                break;
-                case 5: 
-                boxvalues = [33, 34, 35, 42, 43, 44, 51, 52, 53]
-                break;
-                case 6: 
-                boxvalues = [54, 55, 56, 63, 64, 65, 72, 73, 74]
-                break;
-                case 7: 
-                boxvalues = [57, 58, 59, 66, 67, 68, 75, 76, 77]
-                break;
-                case 8: 
-                boxvalues = [60, 61, 62, 69, 70, 71, 78, 79, 80]
-                break;
-                };
-                for (iiii = 0; iiii < 9; iiii++) {
-                if (sudoku[boxvalues[iiii]] == i) {numbercount += 1};
-            }
-            if (numbercount > maxcount) {
-                maxcount = numbercount;
-            }
-            
+            var counter = 0;
+            while (true) {
+                if ((row * 9 + counter != indexnumber) && (sudoku[row * 9 + counter] == sudoku[indexnumber])) {
+                    return 0;
+                }
+                if (counter == 8) {
+                    return 1;
+                }
+                counter += 1;
+            };
         }
-    }
-    return maxcount;
-}
 
-// End of the script --------------------------------------
-</script>
+        // Tsekattu ja toimii
+        function starttest(sudoku) {
+            var numbercount = 0;
+            var maxcount = 0;
+            var testnumbers = [];
+
+            for (i = 1; i < 10; i++) {
+                // Test all
+                for (ii = 0; ii < 9; ii++) {
+
+                    // Test current row
+                    testnumbers = sudoku.slice(0 + ii * 9, 9 + ii * 9);
+                    numbercount = testnumbers.filter(function (element) { return element == i; }).length;
+                    if (numbercount > maxcount) {
+                        maxcount = numbercount;
+                    }
+                    numbercount = 0;
+
+                    // Test current column
+                    for (iii = 0; iii < 9; iii++) {
+                        if (sudoku[9 * iii + ii] == i) { numbercount += 1; };
+                    }
+                    if (numbercount > maxcount) {
+                        maxcount = numbercount;
+                    }
+                    numbercount = 0;
+
+                    // Test current box
+                    var boxvalues = [];
+                    switch (ii) {
+                        case 0:
+                            boxvalues = [0, 1, 2, 9, 10, 11, 18, 19, 20]
+                            break;
+                        case 1:
+                            boxvalues = [3, 4, 5, 12, 13, 14, 21, 22, 23]
+                            break;
+                        case 2:
+                            boxvalues = [6, 7, 8, 15, 16, 17, 24, 25, 26]
+                            break;
+                        case 3:
+                            boxvalues = [27, 28, 29, 36, 37, 38, 45, 46, 47]
+                            break;
+                        case 4:
+                            boxvalues = [30, 31, 32, 39, 40, 41, 48, 49, 50]
+                            break;
+                        case 5:
+                            boxvalues = [33, 34, 35, 42, 43, 44, 51, 52, 53]
+                            break;
+                        case 6:
+                            boxvalues = [54, 55, 56, 63, 64, 65, 72, 73, 74]
+                            break;
+                        case 7:
+                            boxvalues = [57, 58, 59, 66, 67, 68, 75, 76, 77]
+                            break;
+                        case 8:
+                            boxvalues = [60, 61, 62, 69, 70, 71, 78, 79, 80]
+                            break;
+                    };
+                    for (iiii = 0; iiii < 9; iiii++) {
+                        if (sudoku[boxvalues[iiii]] == i) { numbercount += 1 };
+                    }
+                    if (numbercount > maxcount) {
+                        maxcount = numbercount;
+                    }
+
+                }
+            }
+            return maxcount;
+        }
+
+        function reset() {
+            document.getElementById("inputform").reset();
+            document.getElementById("printarea").innerHTML = "";
+        }
+
+        // End of the script --------------------------------------
+    </script>
 
 </head>
 <body>
-<h2>Lightern's Sudoku Solver</h2>
+    <h2>Lightern's Sudoku Solver</h2>
 
 
-<form id="inputform">
-  <input type="text" name="1" size="1">
-  <input type="text" name="2" size="1">
-  <input type="text" name="3" size="1">
-  &nbsp;
-  <input type="text" name="4" size="1">
-  <input type="text" name="5" size="1">
-  <input type="text" name="6" size="1">
-  &nbsp;
-  <input type="text" name="7" size="1">
-  <input type="text" name="8" size="1">
-  <input type="text" name="9" size="1">
-  &nbsp;
-  <br>
-  <input type="text" name="10" size="1">
-  <input type="text" name="11" size="1">
-  <input type="text" name="12" size="1">
-  &nbsp;
-  <input type="text" name="13" size="1">
-  <input type="text" name="14" size="1">
-  <input type="text" name="15" size="1">
-  &nbsp;
-  <input type="text" name="16" size="1">
-  <input type="text" name="17" size="1">
-  <input type="text" name="18" size="1">
-  &nbsp;
-  <br>
-  <input type="text" name="19" size="1">
-  <input type="text" name="20" size="1">
-  <input type="text" name="21" size="1">
-  &nbsp;
-  <input type="text" name="22" size="1">
-  <input type="text" name="23" size="1">
-  <input type="text" name="24" size="1">
-  &nbsp;
-  <input type="text" name="25" size="1">
-  <input type="text" name="26" size="1">
-  <input type="text" name="27" size="1">
-  &nbsp;
-  <br>
-  <br>
-  <input type="text" name="28" size="1">
-  <input type="text" name="29" size="1">
-  <input type="text" name="30" size="1">
-  &nbsp;
-  <input type="text" name="31" size="1">
-  <input type="text" name="32" size="1">
-  <input type="text" name="33" size="1">
-  &nbsp;
-  <input type="text" name="34" size="1">
-  <input type="text" name="35" size="1">
-  <input type="text" name="36" size="1">
-  &nbsp;
-  <br>
-  <input type="text" name="37" size="1">
-  <input type="text" name="38" size="1">
-  <input type="text" name="39" size="1">
-  &nbsp;
-  <input type="text" name="40" size="1">
-  <input type="text" name="41" size="1">
-  <input type="text" name="42" size="1">
-  &nbsp;
-  <input type="text" name="43" size="1">
-  <input type="text" name="44" size="1">
-  <input type="text" name="45" size="1">
-  &nbsp;
-  <br>
-  <input type="text" name="46" size="1">
-  <input type="text" name="47" size="1">
-  <input type="text" name="48" size="1">
-  &nbsp;
-  <input type="text" name="49" size="1">
-  <input type="text" name="50" size="1">
-  <input type="text" name="51" size="1">
-  &nbsp;
-  <input type="text" name="52" size="1">
-  <input type="text" name="53" size="1">
-  <input type="text" name="54" size="1">
-  &nbsp;
-  <br>
-  <br>
-  <input type="text" name="55" size="1">
-  <input type="text" name="56" size="1">
-  <input type="text" name="57" size="1">
-  &nbsp;
-  <input type="text" name="58" size="1">
-  <input type="text" name="59" size="1">
-  <input type="text" name="60" size="1">
-  &nbsp;
-  <input type="text" name="61" size="1">
-  <input type="text" name="62" size="1">
-  <input type="text" name="63" size="1">
-  &nbsp;
-  <br>
-  <input type="text" name="64" size="1">
-  <input type="text" name="65" size="1">
-  <input type="text" name="66" size="1">
-  &nbsp;
-  <input type="text" name="67" size="1">
-  <input type="text" name="68" size="1">
-  <input type="text" name="69" size="1">
-  &nbsp;
-  <input type="text" name="70" size="1">
-  <input type="text" name="71" size="1">
-  <input type="text" name="72" size="1">
-  &nbsp;
-  <br>
-  <input type="text" name="73" size="1">
-  <input type="text" name="74" size="1">
-  <input type="text" name="75" size="1">
-  &nbsp;
-  <input type="text" name="76" size="1">
-  <input type="text" name="77" size="1">
-  <input type="text" name="78" size="1">
-  &nbsp;
-  <input type="text" name="79" size="1">
-  <input type="text" name="80" size="1">
-  <input type="text" name="81" size="1">
-  &nbsp;
-  <br>
-  <br>
-</form> 
+    <form id="inputform">
+        <input type="text" id="1" size="1">
+        <input type="text" id="2" size="1">
+        <input type="text" id="3" size="1">
+        &nbsp;
+        <input type="text" id="4" size="1">
+        <input type="text" id="5" size="1">
+        <input type="text" id="6" size="1">
+        &nbsp;
+        <input type="text" id="7" size="1">
+        <input type="text" id="8" size="1">
+        <input type="text" id="9" size="1">
+        &nbsp;
+        <br>
+        <input type="text" id="10" size="1">
+        <input type="text" id="11" size="1">
+        <input type="text" id="12" size="1">
+        &nbsp;
+        <input type="text" id="13" size="1">
+        <input type="text" id="14" size="1">
+        <input type="text" id="15" size="1">
+        &nbsp;
+        <input type="text" id="16" size="1">
+        <input type="text" id="17" size="1">
+        <input type="text" id="18" size="1">
+        &nbsp;
+        <br>
+        <input type="text" id="19" size="1">
+        <input type="text" id="20" size="1">
+        <input type="text" id="21" size="1">
+        &nbsp;
+        <input type="text" id="22" size="1">
+        <input type="text" id="23" size="1">
+        <input type="text" id="24" size="1">
+        &nbsp;
+        <input type="text" id="25" size="1">
+        <input type="text" id="26" size="1">
+        <input type="text" id="27" size="1">
+        &nbsp;
+        <br>
+        <br>
+        <input type="text" id="28" size="1">
+        <input type="text" id="29" size="1">
+        <input type="text" id="30" size="1">
+        &nbsp;
+        <input type="text" id="31" size="1">
+        <input type="text" id="32" size="1">
+        <input type="text" id="33" size="1">
+        &nbsp;
+        <input type="text" id="34" size="1">
+        <input type="text" id="35" size="1">
+        <input type="text" id="36" size="1">
+        &nbsp;
+        <br>
+        <input type="text" id="37" size="1">
+        <input type="text" id="38" size="1">
+        <input type="text" id="39" size="1">
+        &nbsp;
+        <input type="text" id="40" size="1">
+        <input type="text" id="41" size="1">
+        <input type="text" id="42" size="1">
+        &nbsp;
+        <input type="text" id="43" size="1">
+        <input type="text" id="44" size="1">
+        <input type="text" id="45" size="1">
+        &nbsp;
+        <br>
+        <input type="text" id="46" size="1">
+        <input type="text" id="47" size="1">
+        <input type="text" id="48" size="1">
+        &nbsp;
+        <input type="text" id="49" size="1">
+        <input type="text" id="50" size="1">
+        <input type="text" id="51" size="1">
+        &nbsp;
+        <input type="text" id="52" size="1">
+        <input type="text" id="53" size="1">
+        <input type="text" id="54" size="1">
+        &nbsp;
+        <br>
+        <br>
+        <input type="text" id="55" size="1">
+        <input type="text" id="56" size="1">
+        <input type="text" id="57" size="1">
+        &nbsp;
+        <input type="text" id="58" size="1">
+        <input type="text" id="59" size="1">
+        <input type="text" id="60" size="1">
+        &nbsp;
+        <input type="text" id="61" size="1">
+        <input type="text" id="62" size="1">
+        <input type="text" id="63" size="1">
+        &nbsp;
+        <br>
+        <input type="text" id="64" size="1">
+        <input type="text" id="65" size="1">
+        <input type="text" id="66" size="1">
+        &nbsp;
+        <input type="text" id="67" size="1">
+        <input type="text" id="68" size="1">
+        <input type="text" id="69" size="1">
+        &nbsp;
+        <input type="text" id="70" size="1">
+        <input type="text" id="71" size="1">
+        <input type="text" id="72" size="1">
+        &nbsp;
+        <br>
+        <input type="text" id="73" size="1">
+        <input type="text" id="74" size="1">
+        <input type="text" id="75" size="1">
+        &nbsp;
+        <input type="text" id="76" size="1">
+        <input type="text" id="77" size="1">
+        <input type="text" id="78" size="1">
+        &nbsp;
+        <input type="text" id="79" size="1">
+        <input type="text" id="80" size="1">
+        <input type="text" id="81" size="1">
+        &nbsp;
+        <br>
+        <br>
+    </form>
 
-<button onclick="start()">Solve</button>
+    <button onclick="start()">Solve</button>
+    <button onclick="reset()">Reset</button>
 
-<p id="printarea"></p>
-
-
+    <p id="printarea"></p>
 
 </body>
 </html>
