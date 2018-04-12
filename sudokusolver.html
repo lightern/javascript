@@ -1,5 +1,222 @@
 <!DOCTYPE html>
 <html>
+<head>
+<script>
+    // Beginning of the script --------------------------------
+    
+function start() {
+    var form = document.getElementById("inputform");
+    var sudoku = [];
+    
+    for (i = 0; i < form.length ;i++) {
+        sudoku.push(form.elements[i].value);
+    }
+
+    // Let's check that the form is filled right
+    var maxcount = starttest(sudoku);
+    if (maxcount < 2) {
+        var vastaus = solve(sudoku);
+    }
+
+    document.getElementById("printarea").innerHTML = sudoku[0] + " " + vastaus[0];
+}
+
+
+function solve(sudoku) {
+    var solvables_index = [];
+
+    // Let's create list of indexes for those that need to be solved
+    for (i = 0; i < sudoku.length; i++) {
+        if (sudoku[i] == 0) {
+            solvables_index.push(i);
+        }
+    }
+
+    // n represents an index in whole sudoku number set
+    var n = 0;
+
+    nextn: while (true) {
+        numbersearch: while (true) {
+            // In case of drop (coming backward from higher solvable_index)
+            if (sudoku[solvables_index[n]] == 9) {
+                sudoku[solvables_index[n]] = 0;
+                n -= 1;
+                continue numbersearch;
+            }
+
+            sudoku[solvables_index[n]] += 1;
+            var testsum = 0;
+
+            // Check row
+            testsum += rowtest(solvables_index[n], sudoku);
+            if (testsum == 1) {
+                // Check column
+                testsum += columntest(solvables_index[n], sudoku);
+            }
+            if (testsum == 2) {
+                // Check "box"
+                testsum += boxtest(solvables_index[n], sudoku);
+            }
+
+            if (testsum < 3) {
+                if (sudoku[solvables_index[n]] == 9) {
+                    sudoku[solvables_index[n]] = 0;
+                    if (n == 0) {
+                        console.log("Answer not found!");
+                        // exit(666);          // In case you want to make it without GUI
+                        return sudoku;
+                    }
+
+                    n -= 1;
+                }
+                continue numbersearch;
+            }
+
+            if (n == solvables_index.len() - 1) {
+                break nextn;
+            }
+
+            n += 1;
+        }
+    }
+    return sudoku;
+}
+
+
+
+function rowtest(indexnumber, sudoku) { 
+    switch(indexnumber) {
+        case 0-8:
+            var row = 0;
+            break;
+        case 9-17:
+            var row = 1;
+            break;
+        case 18-26:
+            var row = 2;
+            break;
+        case 27-35:
+            var row = 3;
+            break;
+        case 36-44:
+            var row = 4;
+            break;
+        case 45-53:
+            var row = 5;
+            break;
+        case 54-62:
+            var row = 6;
+            break;
+        case 63-71:
+            var row = 7;
+            break;
+        default:
+            var row = 4;
+            break;
+    };
+
+    var counter = 0;
+    var result = while (true) {
+        if (row * 9 + counter != indexnumber && sudoku[row * 9 + counter] == sudoku[indexnumber]) {
+            break 0;
+        }
+        if (counter == 8) {
+            break 1;
+        }
+        counter += 1;
+    };
+    return result;
+}
+
+
+
+
+
+
+
+
+// -----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+// Tsekattu ja toimii
+function starttest(sudoku) {
+    var numbercount = 0;
+    var maxcount = 0;
+    var testnumbers = [];
+
+    for (i = 1; i < 10; i++) {
+        // Test all
+        for (ii = 0; ii < 9; ii++) {
+            // Test current row
+            testnumbers = sudoku.slice(0+ii*9, 9+ii*9);
+            numbercount = testnumbers.filter(function(element){return element==i;}).length;
+            if (numbercount > maxcount) {
+                maxcount = numbercount;
+            }
+            //console.log(maxcount);
+            numbercount = 0;
+            // Test current column
+            for (iii = 0; iii < 9; iii++) {
+                if (sudoku[9*iii+ii] == i) {numbercount += 1;};
+            }
+            if (numbercount > maxcount) {
+                maxcount = numbercount;
+            }
+            numbercount = 0;
+            // Test current box
+            var boxvalues = [];
+            switch (ii) {
+                case 0: 
+                boxvalues = [0, 1, 2, 9, 10, 11, 18, 19, 20]
+                break;
+                case 1: 
+                boxvalues = [3, 4, 5, 12, 13, 14, 21, 22, 23]
+                break;
+                case 2: 
+                boxvalues = [6, 7, 8, 15, 16, 17, 24, 25, 26]
+                break;
+                case 3: 
+                boxvalues = [27, 28, 29, 36, 37, 38, 45, 46, 47]
+                break;
+                case 4: 
+                boxvalues = [30, 31, 32, 39, 40, 41, 48, 49, 50]
+                break;
+                case 5: 
+                boxvalues = [33, 34, 35, 42, 43, 44, 51, 52, 53]
+                break;
+                case 6: 
+                boxvalues = [54, 55, 56, 63, 64, 65, 72, 73, 74]
+                break;
+                case 7: 
+                boxvalues = [57, 58, 59, 66, 67, 68, 75, 76, 77]
+                break;
+                case 8: 
+                boxvalues = [60, 61, 62, 69, 70, 71, 78, 79, 80]
+                break;
+                };
+                for (iiii = 0; iiii < 9; iiii++) {
+                if (sudoku[boxvalues[iiii]] == i) {numbercount += 1};
+            }
+            if (numbercount > maxcount) {
+                maxcount = numbercount;
+            }
+            
+        }
+    }
+    return maxcount;
+}
+
+// End of the script --------------------------------------
+</script>
+
+</head>
 <body>
 <h2>Lightern's Sudoku Solver</h2>
 
@@ -127,95 +344,11 @@
   <br>
 </form> 
 
-<button onclick="solve()">Solve</button>
+<button onclick="start()">Solve</button>
 
 <p id="printarea"></p>
 
-<script>
-// Beginning of the script --------------------------------
 
-function solve() {
-    var form = document.getElementById("inputform");
-    var sudoku = [];
-    
-    for (i = 0; i < form.length ;i++) {
-        sudoku.push(form.elements[i].value);
-    }
-
-    var maxcount = starttest(sudoku);
-
-    document.getElementById("printarea").innerHTML = sudoku[0] + " " + maxcount;
-}
-
-function starttest(sudoku) {
-    var numbercount = 0;
-    var maxcount = 0;
-    var testnumbers = [];
-
-    for (i = 0; i < 10; i++) {
-        // Test all
-        for (ii = 0; ii < 9; ii++) {
-            // Test current row
-            testnumbers = sudoku.slice(0, 9);
-            numbercount = testnumbers.filter(function(element){return element==i;}).length;
-            if (numbercount > maxcount) {
-                maxcount = numbercount;
-            }
-            numbercount = 0;
-            // Test current column
-            for (iii = 0; iii < 9; iii++) {
-                if (sudoku[9*iii+ii] == i) {numbercount += 1;};
-            }
-            if (numbercount > maxcount) {
-                maxcount = numbercount;
-            }
-            numbercount = 0;
-            // Test current box
-            var boxvalues = [];
-            switch (ii) {
-                case 0: 
-                boxvalues = [0, 1, 2, 9, 10, 11, 18, 19, 20]
-                break;
-                case 1: 
-                boxvalues = [3, 4, 5, 12, 13, 14, 21, 22, 23]
-                break;
-                case 2: 
-                boxvalues = [6, 7, 8, 15, 16, 17, 24, 25, 26]
-                break;
-                case 3: 
-                boxvalues = [27, 28, 29, 36, 37, 38, 45, 46, 47]
-                break;
-                case 4: 
-                boxvalues = [30, 31, 32, 39, 40, 41, 48, 49, 50]
-                break;
-                case 5: 
-                boxvalues = [33, 34, 35, 42, 43, 44, 51, 52, 53]
-                break;
-                case 6: 
-                boxvalues = [54, 55, 56, 63, 64, 65, 72, 73, 74]
-                break;
-                case 7: 
-                boxvalues = [57, 58, 59, 66, 67, 68, 75, 76, 77]
-                break;
-                case 8: 
-                boxvalues = [60, 61, 62, 69, 70, 71, 78, 79, 80]
-                break;
-                };
-                for (iiii = 0; iiii < 9; iiii++) {
-                if (sudoku[boxvalues[iiii]] == i) {numbercount += 1};
-            }
-            if (numbercount > maxcount) {
-                maxcount = numbercount;
-            }
-            
-        }
-    }
-    return maxcount;
-
-}
-
-// End of the script --------------------------------------
-</script>
 
 </body>
 </html>
