@@ -1,5 +1,10 @@
 # install nodejs with pacman which also should install npm
 # create directory and go to working directory
+
+npx create-react-app my-app
+cd my-app
+npm start
+
 npm init
 npm install -S webpack
 # do also this to run it globally
