@@ -6,4 +6,4 @@ npm install -S webpack
 npm install -G webpack
 create scripts.js -file
 touch webpack.config.js
-run webpack
+webpack
